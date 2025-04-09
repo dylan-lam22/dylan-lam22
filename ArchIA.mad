@@ -1,0 +1,106 @@
+
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import IsolationForest
+import matplotlib.pyplot as plt
+
+# Simular datos de tráfico de red
+np.random.seed(1)
+trafico_normal = np.random.normal(loc=50, scale=10, size=(100, 2))  # 100 conexiones normales
+trafico_anormal = np.random.uniform(low=100, high=150, size=(10, 2))  # 10 conexiones anormales
+
+# Combinar datos
+datos = np.vstack((trafico_normal, trafico_anormal))
+df = pd.DataFrame(datos, columns=["Bytes_Enviados", "Bytes_Recibidos"])
+
+# Crear modelo IA (Isolation Forest)
+modelo = IsolationForest(contamination=0.1)  # 10% anomalías esperadas
+modelo.fit(df)
+
+# Predecir
+predicciones = modelo.predict(df)
+
+# Visualizar
+df['Anomalia'] = predicciones
+plt.scatter(df["Bytes_Enviados"], df["Bytes_Recibidos"], c=df["Anomalia"])
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import IsolationForest
+import matplotlib.pyplot as plt
+
+# Simular datos de tráfico de red
+np.random.seed(1)
+trafico_normal = np.random.normal(loc=50, scale=10, size=(100, 2))  # 100 conexiones normales
+trafico_anormal = np.random.uniform(low=100, high=150, size=(10, 2))  # 10 conexiones anormales
+
+# Combinar datos
+datos = np.vstack((trafico_normal, trafico_anormal))
+df = pd.DataFrame(datos, columns=["Bytes_Enviados", "Bytes_Recibidos"])
+
+# Crear modelo IA (Isolation Forest)
+modelo = IsolationForest(contamination=0.1)  # 10% anomalías esperadas
+modelo.fit(df)
+
+# Predecir
+predicciones = modelo.predict(df)
+
+# Visualizar
+df['Anomalia'] = predicciones
+plt.scatter(df["Bytes_Enviados"], df["Bytes_Recibidos"], c=df["Anomalia"])
+plt.title("Detección de tráfico anómalo")
+plt.xlabel("Bytes Enviados")
+plt.ylabel("Bytes Recibidos")
+plt.show()
+
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+# Simulación de dataset (tú puedes reemplazar con datos reales)
+data = {
+    "tamaño_kb": [100, 200, 150, 8000, 9000, 8500],
+    "es_ejecutable": [1, 0, 0, 1, 1, 1],
+    "tipo_archivo": [0, 1, 1, 0, 0, 0],  # 0=exe, 1=txt
+    "malicioso": [0, 0, 0, 1, 1, 1]
+}
+df = pd.DataFrame(data)
+
+# Separar datos
+X = df.drop("malicioso", axis=1)
+y = df["malicioso"]
+
+# Entrenar modelo
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+modelo = RandomForestClassifier()
+modelo.fit(X_train, y_train)
+
+# Evaluación
+y_pred = modelo.predict(X_test)
+print("Reporte de detección de archivos maliciosos:")
+print(classification_report(y_test, y_pred))
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+# Simulación de dataset (tú puedes reemplazar con datos reales)
+data = {
+    "tamaño_kb": [100, 200, 150, 8000, 9000, 8500],
+    "es_ejecutable": [1, 0, 0, 1, 1, 1],
+    "tipo_archivo": [0, 1, 1, 0, 0, 0],  # 0=exe, 1=txt
+    "malicioso": [0, 0, 0, 1, 1, 1]
+}
+df = pd.DataFrame(data)
+
+# Separar datos
+X = df.drop("malicioso", axis=1)
+y = df["malicioso"]
+
+# Entrenar modelo
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+modelo = RandomForestClassifier()
+modelo.fit(X_train, y_train)
+
+# Evaluación
+y_pred = modelo.predict(X_test)
+print("Reporte de detección de archivos maliciosos:")
+print(classification_report(y_test, y_pred))
