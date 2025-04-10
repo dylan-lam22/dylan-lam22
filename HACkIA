@@ -1,0 +1,100 @@
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.ensemble import IsolationForest
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+st.set_page_config(page_title="IA Anti-Hack", layout="wide")
+st.title("IA Anti-Hack: Protección Inteligente")
+
+# Menú lateral
+modulo = st.sidebar.selectbox("Selecciona un módulo", [
+    "Inicio",
+    "1. Detector de Malware (archivos)",
+    "2. Detector de Phishing (mensajes)",
+    "3. Intentos de Acceso Sospechoso",
+    "4. Análisis de Red Anómala"
+])
+
+# Inicio
+if modulo == "Inicio":
+    st.markdown("### Bienvenido a tu sistema de IA Anti-Hack")
+    st.markdown("- Puedes analizar archivos, mensajes, registros de acceso y tráfico de red.")
+    st.markdown("- Los modelos incluidos son básicos y puedes mejorarlos con tus propios datos.")
+    st.markdown("Creado con Streamlit + Scikit-Learn")
+
+# Módulo 1: Detector de Malware
+elif modulo == "1. Detector de Malware (archivos)":
+    st.subheader("Sube un archivo CSV con columnas como: tamaño_kb, es_ejecutable, tipo_archivo, malicioso")
+    archivo = st.file_uploader("Cargar CSV", type=["csv"])
+    
+    if archivo:
+        df = pd.read_csv(archivo)
+        st.write(df.head())
+        if "malicioso" in df.columns:
+            X = df.drop("malicioso", axis=1)
+            y = df["malicioso"]
+            modelo = RandomForestClassifier()
+            modelo.fit(X, y)
+            pred = modelo.predict(X)
+            df["predicción"] = pred
+            st.success("Análisis completado")
+            st.write(df)
+            st.text(classification_report(y, pred))
+
+# Módulo 2: Detector de Phishing
+elif modulo == "2. Detector de Phishing (mensajes)":
+    st.subheader("Detector de mensajes de phishing o sospechosos")
+    ejemplo = st.text_area("Escribe o pega el mensaje aquí")
+    
+    datos = ["Actualiza tu cuenta", "Haz clic aquí para ganar", "Hola, ¿cómo estás?", ejemplo]
+    etiquetas = [1, 1, 0, 0]  # 1 = phishing
+
+    vectorizer = CountVectorizer()
+    X = vectorizer.fit_transform(datos)
+    modelo = LogisticRegression()
+    modelo.fit(X, etiquetas)
+
+    if ejemplo:
+        entrada = vectorizer.transform([ejemplo])
+        resultado = modelo.predict(entrada)
+        if resultado[0] == 1:
+            st.error("¡Mensaje sospechoso! Posible intento de phishing.")
+        else:
+            st.success("Mensaje seguro.")
+
+# Módulo 3: Accesos sospechosos
+elif modulo == "3. Intentos de Acceso Sospechoso":
+    st.subheader("Análisis de accesos al sistema")
+    st.markdown("Ejemplo: hora_login, intentos_fallidos, ubicación_riesgosa (0 o 1)")
+    archivo = st.file_uploader("Sube CSV de accesos", type=["csv"], key="accesos")
+
+    if archivo:
+        df = pd.read_csv(archivo)
+        st.write(df.head())
+        modelo = IsolationForest(contamination=0.1)
+        modelo.fit(df)
+        df["riesgo"] = modelo.predict(df)
+        df["riesgo"] = df["riesgo"].map({1: "Normal", -1: "Sospechoso"})
+        st.write(df)
+
+# Módulo 4: Tráfico de red
+elif modulo == "4. Análisis de Red Anómala":
+    st.subheader("Detectar comportamiento inusual en tráfico de red")
+    st.markdown("Sube CSV con columnas como: bytes_enviados, bytes_recibidos")
+
+    archivo = st.file_uploader("Sube CSV de tráfico de red", type=["csv"], key="red")
+
+    if archivo:
+        df = pd.read_csv(archivo)
+        st.write(df.head())
+        modelo = IsolationForest(contamination=0.1)
+        modelo.fit(df)
+        df["anomalía"] = modelo.predict(df)
+        df["anomalía"] = df["anomalía"].map({1: "Normal", -1: "Anómalo"})
+        st.write(df)
